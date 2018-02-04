@@ -4,7 +4,13 @@ const through = require('through2')
 
 var xinput
 
+const commands = {
+  list: '-l, --list   list touchpad xinput devices',
+  help: '-h, --help   show this message'
+}
+
 module.exports = Toggle
+
 function Toggle () {
   if (!this instanceof Toggle) return new Toggle()
   this.deviceId = null
@@ -23,6 +29,11 @@ Toggle.prototype.list = function list () {
   })
 }
 
+Toggle.prototype.usage = function usage () {
+  console.log('toggle-touchpad: Enable/disable xinput touchpad devices')
+  console.log(`Usage:\t ${commands.list}`)
+  console.log('\t ' + commands.help)
+}
 
 function writeTouchPad (buf, _, next) {
   var b = buf.toString()
