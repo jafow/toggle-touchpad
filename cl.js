@@ -2,14 +2,16 @@
 
 const minimist = require('minimist')
 const Toggle = require('./index')
-const tog = new Toggle()
+const ttp = new Toggle()
 
 const parseArgs = minimist(process.argv)
 
 if (parseArgs.list || parseArgs.l) {
-  tog.list()
+  ttp.list()
 }
 
 if (parseArgs.h || parseArgs.help) {
-  tog.usage()
+  ttp.usage()
 }
+
+ttp.toggle()

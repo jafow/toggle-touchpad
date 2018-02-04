@@ -1,3 +1,5 @@
+const fs = require('fs')
+const os = require('os')
 const spawn = require('child_process').spawn
 const split = require('split')
 const through = require('through2')
@@ -30,9 +32,24 @@ Toggle.prototype.list = function list () {
 }
 
 Toggle.prototype.usage = function usage () {
-  console.log('toggle-touchpad: Enable/disable xinput touchpad devices')
+  console.log(`toggle-touchpad: Enable/disable xinput touchpad devices`)
   console.log(`Usage:\t ${commands.list}`)
-  console.log('\t ' + commands.help)
+  console.log(`\t  ${commands.help}`)
+}
+
+Toggle.prototype.toggle = function toggle () {
+  var tmpId = `${os.tmpdir()}/ttp-id`
+  var stream = fs.createWriteStream(tmpId)
+
+  xinput = spawn('xinput', ['--list'])  
+  xinput.stdout
+    .pipe(split())
+    .pipe(through(writeTouchPad))
+    .pipe(stream)
+
+  xinput.on('close', () => {
+    fs.createReadStream('/tmp/ttp-id').pipe(process.stdout)
+  })
 }
 
 function writeTouchPad (buf, _, next) {
