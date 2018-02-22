@@ -40,8 +40,6 @@ Toggle.prototype.usage = function usage () {
       console.log(commands[key])
     }
   }
-  // console.log(`Usage:\t ${commands.list}`)
-  // console.log(`\t  ${commands.help}`)
 }
 
 Toggle.prototype.disable = function disable () {
