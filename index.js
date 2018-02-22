@@ -7,19 +7,21 @@ const through = require('through2')
 var xinput
 
 const commands = {
-  list: '-l, --list   list touchpad xinput devices',
-  help: '-h, --help   show this message'
+  list: 'Usage: \t -l, --list list touchpad xinput devices',
+  disable: '\t -d --disable  disable touchpad',
+  enable: '\t -e --enable  enable touchpad',
+  help: '\t -h, --help show this message'
 }
 
 module.exports = Toggle
 
 function Toggle () {
-  if (!this instanceof Toggle) return new Toggle()
-  this.deviceId = null
+  if (!(this instanceof Toggle)) return new Toggle()
+  this.tmpId = `${os.tmpdir()}/toggletouchpad-id`
 }
 
 Toggle.prototype.list = function list () {
-  xinput = spawn('xinput', ['--list'])  
+  xinput = spawn('xinput', ['--list'])
   xinput.stdout
     .pipe(split())
     .pipe(through(listTouchPad))
@@ -27,29 +29,69 @@ Toggle.prototype.list = function list () {
 
   xinput.stderr.on('data', (err) => {
     throw new Error(`error on --list ${err.toString()}`)
-    process.exit(1)
   })
 }
 
 Toggle.prototype.usage = function usage () {
   console.log(`toggle-touchpad: Enable/disable xinput touchpad devices`)
-  console.log(`Usage:\t ${commands.list}`)
-  console.log(`\t  ${commands.help}`)
+
+  for (let key in commands) {
+    if (commands.hasOwnProperty(key)) {
+      console.log(commands[key])
+    }
+  }
+  // console.log(`Usage:\t ${commands.list}`)
+  // console.log(`\t  ${commands.help}`)
 }
 
-Toggle.prototype.toggle = function toggle () {
-  var tmpId = `${os.tmpdir()}/ttp-id`
-  var stream = fs.createWriteStream(tmpId)
+Toggle.prototype.disable = function disable () {
+  var stream = fs.createWriteStream(this.tmpId)
 
-  xinput = spawn('xinput', ['--list'])  
+  xinput = spawn('xinput', ['--list'])
   xinput.stdout
     .pipe(split())
     .pipe(through(writeTouchPad))
     .pipe(stream)
 
   xinput.on('close', () => {
-    fs.createReadStream('/tmp/ttp-id').pipe(process.stdout)
+    fs.readFile(this.tmpId, disableDeviceId)
   })
+}
+
+Toggle.prototype.enable = function enable () {
+  var stream = fs.createWriteStream(this.tmpId)
+
+  xinput = spawn('xinput', ['--list'])
+  xinput.stdout
+    .pipe(split())
+    .pipe(through(writeTouchPad))
+    .pipe(stream)
+
+  xinput.on('close', () => {
+    fs.readFile(this.tmpId, enableDeviceId)
+  })
+}
+
+function disableDeviceId (err, data) {
+  if (err) {
+    console.error('Cant find device id', err)
+    return err
+  }
+  var id = parseInt(data.toString(), 10)
+  var spawnDisable = spawn('xinput', ['disable', `${id}`])
+  spawnDisable.stdout.pipe(process.stdout)
+  spawnDisable.stderr.pipe(process.stdout)
+}
+
+function enableDeviceId (err, data) {
+  if (err) {
+    console.error('Cant find device id', err)
+    return err
+  }
+  var id = parseInt(data.toString(), 10)
+  var spawnEnable = spawn('xinput', ['enable', `${id}`])
+  spawnEnable.stdout.pipe(process.stdout)
+  spawnEnable.stderr.pipe(process.stdout)
 }
 
 function writeTouchPad (buf, _, next) {

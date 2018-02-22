@@ -14,4 +14,10 @@ if (parseArgs.h || parseArgs.help) {
   ttp.usage()
 }
 
-ttp.toggle()
+if (parseArgs.disable || parseArgs.d) {
+  ttp.disable()
+}
+
+if (parseArgs.enable || parseArgs.e) {
+  ttp.enable()
+}
