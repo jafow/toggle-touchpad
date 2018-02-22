@@ -6,6 +6,9 @@
   "scripts": {
     "test": "node test.js | tap-spec"
   },
+  "bin": {
+    "ttp": "cli.js"
+  },
   "keywords": [
     "touchpad",
     "xinput"
