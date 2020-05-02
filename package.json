@@ -1,6 +1,6 @@
 {
   "name": "toggle-touchpad",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "toggle laptop touchpad on/off",
   "main": "index.js",
   "scripts": {
