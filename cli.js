@@ -6,18 +6,25 @@ const ttp = new Toggle()
 
 const parseArgs = minimist(process.argv)
 
-if (parseArgs.list || parseArgs.l) {
-  ttp.list()
+function main () {
+  if (parseArgs.list || parseArgs.l) {
+    return ttp.list()
+  }
+
+  if (parseArgs.h || parseArgs.help) {
+    return ttp.usage()
+  }
+
+  if (parseArgs.disable || parseArgs.d) {
+    return ttp.disable()
+  }
+
+  if (parseArgs.enable || parseArgs.e) {
+    return ttp.enable()
+  } else {
+    ttp.usage()
+    process.exit(1)
+  }
 }
 
-if (parseArgs.h || parseArgs.help) {
-  ttp.usage()
-}
-
-if (parseArgs.disable || parseArgs.d) {
-  ttp.disable()
-}
-
-if (parseArgs.enable || parseArgs.e) {
-  ttp.enable()
-}
+main()
